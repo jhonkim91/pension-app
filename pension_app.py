@@ -238,30 +238,50 @@ def fetch_prices(tickers: tuple) -> dict:
 
 
 def get_all_prices():
-    """전체 보유 종목 현재가 딕셔너리 반환"""
+    """
+    전체 보유 종목 현재가 딕셔너리 반환
+    ETF → yfinance
+    교보악사파워인덱스 → 네이버금융 스크래핑
+    """
     all_holdings = {
         **ME_PENSION_HOLDINGS,
         **ME_IRP_HOLDINGS,
         **WIFE_PENSION_HOLDINGS
     }
+
+    # ① yfinance ETF 조회
     tickers = tuple(set(
         v["ticker"] for v in all_holdings.values()
-        if v["ticker"] != "MANUAL"
+        if v["ticker"] not in ("MANUAL",)
     ))
     fetched = fetch_prices(tickers)
 
-    # 종목명 → 현재가 매핑
+    # ② 네이버금융 펀드 조회 (교보악사)
+    naver_prices = fetch_all_naver_funds()
+
+    # ③ 종목명 → 현재가 매핑
     name_to_price = {}
     for name, info in all_holdings.items():
         t = info["ticker"]
-        if t == "MANUAL":
-            name_to_price[name] = MANUAL_PRICES.get(name, info["avg"])
+
+        # 네이버금융으로 가져온 경우
+        if name in naver_prices:
+            name_to_price[name] = naver_prices[name]
+
+        # yfinance로 가져온 경우
         elif t in fetched:
             name_to_price[name] = fetched[t]
+
+        # MANUAL (수동입력) — UI에서 덮어쓰기 가능
+        elif t == "MANUAL":
+            name_to_price[name] = MANUAL_PRICES.get(name, info["avg"])
+
+        # 조회 실패 → 평균매입가로 대체
         else:
-            # 조회 실패 시 평균매입가 사용 (0으로 표시 방지)
             name_to_price[name] = info["avg"]
-    return name_to_price, fetched
+
+    return name_to_price, fetched, naver_prices
+
 
 
 def build_portfolio_df(holdings: dict, prices: dict,
