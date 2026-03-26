@@ -58,7 +58,7 @@ ME_PENSION = {
     "KODEX 로봇액티브":      {"ticker":"412560.KS",  "qty":110,    "avg":32355,    "acct":"나_연금"},
     "PLUS K방산":            {"ticker":"455890.KS",  "qty":48,     "avg":73563,    "acct":"나_연금"},
     "교보악사파워인덱스":    {"ticker":"NAVER_FUND", "qty":888035, "avg":2672.85,  "acct":"나_연금",
-                              "fund_url":"https://www.funetf.co.kr/product/fund/view/KR5207895248"},
+                              "fund_url":"https://www.funetf.co.kr/product/fund/view/K55207BU0715"},
     "PLUS 고배당주채권혼합": {"ticker":"480040.KS",  "qty":454,    "avg":15655,    "acct":"나_연금"},
 }
 
