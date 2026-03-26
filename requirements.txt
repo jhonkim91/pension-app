@@ -5,3 +5,6 @@ plotly
 yfinance
 openpyxl
 xlrd
+requests
+beautifulsoup4
+
