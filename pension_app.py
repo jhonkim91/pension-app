@@ -103,6 +103,88 @@ WIFE_KYOBO_AMOUNT = 2916576
 #  현재가 조회 (yfinance + 수동 보완)
 # ══════════════════════════════════════════════
 @st.cache_data(ttl=300)  # 5분 캐시
+import requests
+from bs4 import BeautifulSoup
+
+# ══════════════════════════════════════════════
+#  네이버금융 펀드 기준가 스크래핑
+#  교보악사파워인덱스 전용
+# ══════════════════════════════════════════════
+
+# 펀드코드 매핑 (네이버금융 기준)
+NAVER_FUND_CODES = {
+    # 나의 퇴직연금용 (ClassCW — 퇴직연금 클래스)
+    "교보악사파워인덱스": "KR5207764550",
+}
+
+@st.cache_data(ttl=300)  # 5분 캐시
+def fetch_naver_fund_price(fund_code: str) -> float:
+    """
+    네이버금융 펀드 페이지에서 기준가 스크래핑
+    fund_code: 예) KR5207764550
+    반환: 기준가 (float), 실패 시 0.0
+    """
+    url = f"https://finance.naver.com/fund/fundDetail.naver?fundCd={fund_code}"
+    headers = {
+        "User-Agent": (
+            "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) "
+            "AppleWebKit/605.1.15 (KHTML, like Gecko) "
+            "Version/17.0 Mobile/15E148 Safari/604.1"
+        ),
+        "Referer": "https://finance.naver.com/fund/",
+        "Accept-Language": "ko-KR,ko;q=0.9",
+    }
+    try:
+        resp = requests.get(url, headers=headers, timeout=8)
+        resp.encoding = "utf-8"
+        soup = BeautifulSoup(resp.text, "html.parser")
+
+        # 방법 1: 기준가 테이블에서 추출
+        # 네이버금융 펀드 상세 페이지 구조
+        price_tag = soup.select_one(".num.price")
+        if price_tag:
+            price_str = price_tag.get_text(strip=True).replace(",","")
+            return float(price_str)
+
+        # 방법 2: strong 태그에서 숫자 추출
+        strong_tags = soup.find_all("strong", class_="tit_num")
+        for tag in strong_tags:
+            txt = tag.get_text(strip=True).replace(",","").replace("원","")
+            try:
+                val = float(txt)
+                if 1000 < val < 100000:  # 기준가 범위 필터
+                    return val
+            except ValueError:
+                continue
+
+        # 방법 3: 메타 description에서 추출
+        meta = soup.find("meta", {"name": "description"})
+        if meta:
+            import re
+            content = meta.get("content", "")
+            # "기준가 2,933.99원" 패턴 검색
+            match = re.search(r"기준가\s*[\s:]?\s*([\d,]+\.?\d*)\s*원", content)
+            if match:
+                return float(match.group(1).replace(",",""))
+
+        return 0.0
+
+    except Exception as e:
+        return 0.0
+
+
+@st.cache_data(ttl=300)
+def fetch_all_naver_funds() -> dict:
+    """
+    NAVER_FUND_CODES 전체 기준가 조회
+    반환: {"교보악사파워인덱스": 2933.99, ...}
+    """
+    result = {}
+    for name, code in NAVER_FUND_CODES.items():
+        price = fetch_naver_fund_price(code)
+        if price > 0:
+            result[name] = price
+    return result
 def fetch_prices(tickers: tuple) -> dict:
     """
     야후 파이낸스에서 현재가 일괄 조회.
