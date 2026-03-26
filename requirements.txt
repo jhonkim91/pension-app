@@ -7,4 +7,3 @@ openpyxl
 xlrd
 requests
 beautifulsoup4
-
