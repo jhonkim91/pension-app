@@ -7,3 +7,4 @@ openpyxl
 xlrd
 requests
 beautifulsoup4
+feedparser
