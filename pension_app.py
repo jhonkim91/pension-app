@@ -56,7 +56,7 @@ ME_PENSION = {
     "KODEX AI반도체핵심장비": {"ticker": "465660.KS",  "qty": 151,    "avg": 23451,   "acct": "나_연금"},
     "KODEX 로봇액티브":       {"ticker": "412560.KS",  "qty": 110,    "avg": 32355,   "acct": "나_연금"},
     "PLUS K방산":             {"ticker": "455890.KS",  "qty": 48,     "avg": 73563,   "acct": "나_연금"},
-    "교보악사파워인덱스":     {"ticker": "NAVER_FUND", "qty": 888035, "avg": 2.67285, "acct": "나_연금",
+    "교보악사파워인덱스":     {"ticker": "NAVER_FUND", "qty": 888035, "avg": 2672.85, "acct": "나_연금",
                                "fund_url": "https://www.funetf.co.kr/product/fund/view/KR5207895248"},
     "PLUS 고배당주채권혼합":  {"ticker": "480040.KS",  "qty": 454,    "avg": 15655,   "acct": "나_연금"},
 }
@@ -69,7 +69,6 @@ ME_IRP = {
 
 WIFE_PENSION = {
     "KODEX 로봇액티브":       {"ticker": "412560.KS", "qty": 50,  "avg": 32970, "acct": "와이프_연금"},
-    "KODEX AI반도체핵심장비": {"ticker": "465660.KS", "qty": 30,  "avg": 25920, "acct": "와이프_연금"},
     "PLUS K방산":             {"ticker": "455890.KS", "qty": 14,  "avg": 74820, "acct": "와이프_연금"},
     "SOL AI반도체소부장":     {"ticker": "448540.KS", "qty": 163, "avg": 12920, "acct": "와이프_연금"},
     "KODEX 자동차":           {"ticker": "091180.KS", "qty": 110, "avg": 22270, "acct": "와이프_연금"},
