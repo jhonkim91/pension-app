@@ -52,27 +52,35 @@ st.markdown("""
 # 보유종목 정의
 # ─────────────────────────────────────────────
 ME_PENSION = {
-    "KODEX AI전력핵심설비":   {"ticker": "487240.KS",  "qty": 120,    "avg": 29559,   "acct": "나_연금"},
-    "KODEX AI반도체핵심장비": {"ticker": "465660.KS",  "qty": 151,    "avg": 23451,   "acct": "나_연금"},
-    "KODEX 로봇액티브":       {"ticker": "412560.KS",  "qty": 110,    "avg": 32355,   "acct": "나_연금"},
-    "PLUS K방산":             {"ticker": "455890.KS",  "qty": 48,     "avg": 73563,   "acct": "나_연금"},
-    "교보악사파워인덱스":     {"ticker": "NAVER_FUND", "qty": 888035, "avg": 2672.85, "acct": "나_연금",
-                               "fund_url": "https://www.funetf.co.kr/product/fund/view/KR5207895248"},
-    "PLUS 고배당주채권혼합":  {"ticker": "480040.KS",  "qty": 454,    "avg": 15655,   "acct": "나_연금"},
+    "KODEX AI전력핵심설비":   {"ticker": "487240.KS",  "qty": 120,    "avg": 29559.0,  "acct": "나_연금", "type": "ETF"},
+    "KODEX AI반도체핵심장비": {"ticker": "465660.KS",  "qty": 151,    "avg": 23451.0,  "acct": "나_연금", "type": "ETF"},
+    "KODEX 로봇액티브":       {"ticker": "412560.KS",  "qty": 110,    "avg": 32355.0,  "acct": "나_연금", "type": "ETF"},
+    "PLUS K방산":             {"ticker": "455890.KS",  "qty": 48,     "avg": 73563.0,  "acct": "나_연금", "type": "ETF"},
+    "교보악사파워인덱스":     {
+        "ticker":   "NAVER_FUND",
+        "qty":      888035,       # 보유 좌수
+        "avg":      2672.85,      # 매입 당시 기준가 (원)
+        "buy_amt":  2373251272,   # 실제 매입금액 = 888035 * 2672.85 (원) ← 직접 확인 후 수정
+        "acct":     "나_연금",
+        "type":     "FUND",
+        "fund_url": "https://www.funetf.co.kr/product/fund/view/KR5207895248",
+    },
+    "PLUS 고배당주채권혼합":  {"ticker": "480040.KS",  "qty": 454,    "avg": 15655.0,  "acct": "나_연금", "type": "ETF"},
 }
 
 ME_IRP = {
-    "TIGER 반도체TOP10":     {"ticker": "385720.KS", "qty": 5,  "avg": 27319, "acct": "나_IRP"},
-    "TIME 글로벌탑픽액티브": {"ticker": "0113D0.KS", "qty": 12, "avg": 11188, "acct": "나_IRP"},
-    "PLUS 고배당주채권혼합": {"ticker": "480040.KS", "qty": 3,  "avg": 15745, "acct": "나_IRP"},
+    "TIGER 반도체TOP10":     {"ticker": "385720.KS", "qty": 5,  "avg": 27319.0, "acct": "나_IRP", "type": "ETF"},
+    "TIME 글로벌탑픽액티브": {"ticker": "0113D0.KS", "qty": 12, "avg": 11188.0, "acct": "나_IRP", "type": "ETF"},
+    "PLUS 고배당주채권혼합": {"ticker": "480040.KS", "qty": 3,  "avg": 15745.0, "acct": "나_IRP", "type": "ETF"},
 }
 
 WIFE_PENSION = {
-    "KODEX 로봇액티브":       {"ticker": "412560.KS", "qty": 50,  "avg": 32970, "acct": "와이프_연금"},
-    "PLUS K방산":             {"ticker": "455890.KS", "qty": 14,  "avg": 74820, "acct": "와이프_연금"},
-    "SOL AI반도체소부장":     {"ticker": "448540.KS", "qty": 163, "avg": 12920, "acct": "와이프_연금"},
-    "KODEX 자동차":           {"ticker": "091180.KS", "qty": 110, "avg": 22270, "acct": "와이프_연금"},
-    "PLUS 고배당주채권혼합":  {"ticker": "480040.KS", "qty": 530, "avg": 14690, "acct": "와이프_연금"},
+    "KODEX 로봇액티브":       {"ticker": "412560.KS", "qty": 50,  "avg": 32970.0, "acct": "와이프_연금", "type": "ETF"},
+    "KODEX AI반도체핵심장비": {"ticker": "465660.KS", "qty": 30,  "avg": 25920.0, "acct": "와이프_연금", "type": "ETF"},
+    "PLUS K방산":             {"ticker": "455890.KS", "qty": 14,  "avg": 74820.0, "acct": "와이프_연금", "type": "ETF"},
+    "SOL AI반도체소부장":     {"ticker": "448540.KS", "qty": 163, "avg": 12920.0, "acct": "와이프_연금", "type": "ETF"},
+    "KODEX 자동차":           {"ticker": "091180.KS", "qty": 110, "avg": 22270.0, "acct": "와이프_연금", "type": "ETF"},
+    "PLUS 고배당주채권혼합":  {"ticker": "480040.KS", "qty": 530, "avg": 14690.0, "acct": "와이프_연금", "type": "ETF"},
 }
 
 ALL_HOLDINGS = {}
@@ -198,32 +206,50 @@ def get_all_prices():
 def build_df(holdings, name_prices, sources):
     rows = []
     for name, info in holdings.items():
-        qty = info["qty"]
-        avg = info["avg"]
-        acct = info["acct"]
-        price = name_prices.get(name, avg)
-        src = sources.get(name, "")
-        buy_val = qty * avg
-        eval_val = qty * price
-        pnl = eval_val - buy_val
-        ret = (pnl / buy_val * 100) if buy_val > 0 else 0.0
+        qty    = info["qty"]
+        avg    = info["avg"]
+        acct   = info["acct"]
+        itype  = info.get("type", "ETF")
+        price  = name_prices.get(name, avg)
+        src    = sources.get(name, "")
+
+        if itype == "FUND":
+            # ── 펀드 계산 ──────────────────────────────────────
+            # 펀드 기준가는 1좌=1원 기준이 아니라
+            # 실제 기준가(예: 3,432원)를 그대로 사용
+            # 매입금액: buy_amt 가 있으면 우선 사용, 없으면 qty * avg
+            buy_val  = info.get("buy_amt", qty * avg)
+            # 평가금액: 좌수 × (현재 기준가 / 매입 기준가) × 매입금액
+            # = 매입금액 × (현재기준가 / 매입기준가)
+            eval_val = buy_val * (price / avg) if avg > 0 else buy_val
+            pnl      = eval_val - buy_val
+            ret_pct  = (price - avg) / avg * 100 if avg > 0 else 0.0
+
+        else:
+            # ── ETF / 주식 계산 ────────────────────────────────
+            buy_val  = qty * avg
+            eval_val = qty * price
+            pnl      = eval_val - buy_val
+            ret_pct  = (pnl / buy_val * 100) if buy_val > 0 else 0.0
+
         rows.append({
             "종목명":    name,
             "계좌":      acct,
+            "구분":      itype,
             "수량":      qty,
             "평균단가":  avg,
             "현재가":    price,
             "매입금액":  buy_val,
             "평가금액":  eval_val,
             "손익":      pnl,
-            "수익률(%)": round(ret, 2),
+            "수익률(%)": round(ret_pct, 2),
             "출처":      src,
         })
+
     df = pd.DataFrame(rows)
     total = df["평가금액"].sum()
     df["비중(%)"] = (df["평가금액"] / total * 100).round(2) if total > 0 else 0.0
     return df
-
 
 def get_signal(row):
     r = row["수익률(%)"]
